@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
 
+const AppError = require('./config/appError');
 const emissionRouter = require('./server/routes/emissionRoutes');
 const statRouter = require('./server/routes/statRoutes');
 
@@ -23,6 +24,11 @@ app.use('/api/v1/stats', statRouter);
 app.get('/', (req, res, next) => {
     res.send("Welcome to Atlas Metrics Test");
 })
+
+app.use((req, res, next) => {
+    let err = new AppError(`${req.ip} tried to reach a resource at ${req.originalUrl} that is not on this server.`, 404);
+    next(err);
+});
 
 
 module.exports = app;
