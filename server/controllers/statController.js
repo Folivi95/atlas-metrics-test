@@ -50,3 +50,50 @@ exports.get = async (req, res, next) => {
         return next(err);
     }
 }
+
+exports.getStats = async (req, res, next) => {
+    try {
+        let productId = req.params.id;
+        let emissions = [];
+        let average_emissions = 0;
+        let total_emissions = 0;
+        let item_with_highest_emission;
+        let day_with_highest_emission;
+        let highest_emission = 0;
+
+        emissions = await Emission.findAll({where: {productId}});
+
+        for (let item of emissions) {
+            total_emissions += Number(item.emission);
+
+            // check for highest emission
+            if (item.emission > highest_emission) {
+                highest_emission = item.emission;
+                item_with_highest_emission = item;
+            }
+        }
+
+        // calculate average emissions
+        average_emissions = total_emissions / emissions.length;
+
+        // set date with highest emission
+        day_with_highest_emission = item_with_highest_emission.recordedAt;
+
+        let resp = {
+            code: 200,
+            status: 'success',
+            message: 'Emissions data retrieved successfully',
+            data: {
+                average_emissions,
+                total_emissions,
+                day_with_highest_emission
+            }
+        }
+
+        res.status(resp.code).json(resp);
+        res.locals.resp = resp;
+        return next();
+    } catch (err) {
+        console.error('Get Stats Data Error: ')
+    }
+}
