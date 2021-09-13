@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 
 const AppError = require('./config/appError');
+const errorHandler = require('./server/controllers/errorController');
 const emissionRouter = require('./server/routes/emissionRoutes');
 const statRouter = require('./server/routes/statRoutes');
 
@@ -30,5 +31,5 @@ app.use((req, res, next) => {
     next(err);
 });
 
-
+app.use(errorHandler);
 module.exports = app;
